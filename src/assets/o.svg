@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="46px" height="49px" viewBox="0 0 46 49" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 41 (35326) - http://www.bohemiancoding.com/sketch -->
+    <title>Shape</title>
+    <desc>Created with Sketch.</desc>
+    <defs></defs>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="tic-tac-toe-with-hearts" transform="translate(-165.000000, -283.000000)" fill="#000000">
+            <g id="Group">
+                <path d="M191.333,286.479 C187.661,289.539 184.601,293.823 185.213,298.107 L185.213,298.718 C183.989,297.493 182.765,296.271 181.541,295.046 C172.361,286.479 161.345,297.493 166.241,307.285 L166.241,307.285 C169.913,314.63 176.645,321.973 182.153,328.094 C187.661,334.214 198.677,331.155 199.901,323.198 C201.737,314.631 204.797,307.286 209.081,299.942 C215.2,288.926 200.512,278.522 191.333,286.479 Z" id="Shape"></path>
+            </g>
+        </g>
+    </g>
+</svg>
