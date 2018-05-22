@@ -32,8 +32,20 @@ const DIR = [
 class Caro {
   constructor (options) {
     this.cells = {}
+    this.ticker = ''
+    this.otherTicker = ''
+    this.myTurn = true
 
     this.createGrid(options)
+  }
+
+  setup ({ ticker }) {
+    this.ticker = ticker
+    this.otherTicker = ticker === 'x' ? 'o' : 'x'
+  }
+
+  isPlaying () {
+    return this.ticker
   }
 
   createGrid ({ rowNo, colNo }) {
@@ -75,8 +87,9 @@ class Caro {
     this.cells[`${row}:${col}`].type = tick
   }
 
-  setTick (tick, cellId) {
+  setTick (tick, cellId, isTheirTurn) {
     this.setCell(tick, cellId)
+    this.myTurn = isTheirTurn
     return this.isWinner(tick, cellId)
   }
 
@@ -160,11 +173,11 @@ class Caro {
       for (const candidatePath of candidatePaths) {
         const length = candidatePath.length
 
-        if (length >= 3) {
+        if (length >= 4) {
           const prevCell = this.getCell(path[candidatePath[0] - 1]) || {}
           const nextCell = this.getCell(path[candidatePath[length - 1] + 1]) || {}
 
-          if (length === 3) {
+          if (length === 4) {
             if (!prevCell.type && !nextCell.type) {
               isWin = true
             }
@@ -186,6 +199,10 @@ class Caro {
       }
 
       if (isWin) break
+    }
+
+    if (isWin) {
+      this.isOver = true
     }
 
     return {

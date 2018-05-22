@@ -9,6 +9,12 @@ io.on('connection', function (socket) {
   socket.emit('data', { message: 'welcome to the chat' })
 
   socket.on('setTick', function (data) {
+    console.log('setTick', data)
     io.sockets.emit('updateTick', data)
+  })
+
+  socket.on('setupGame', function (data) {
+    console.log('setupGame', data)
+    io.sockets.emit('setupGame', data)
   })
 })
