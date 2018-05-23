@@ -61,6 +61,8 @@ dom.parents = function (el, callback) {
  * @return {String} newClass
  */
 dom.addClass = function (elem, value) {
+  if (elem.className.indexOf(value) !== -1) return
+
   const current = `${elem.className} ${value}`
 
   return (elem.className = current.trim())

@@ -57,6 +57,9 @@ export default {
       this.caro.setup({
         ticker: data.ticker === 'x' ? 'o' : 'x'
       })
+
+      modal.hideModal('modal-winner')
+      modal.hideModal('modal-loose')
     })
 
     const rowNo = 20

@@ -38,7 +38,7 @@ router.get('*', async (ctx, next) => {
 app.use(router.routes())
 
 const io = require('socket.io')(app.listen(process.env.PORT || 3000, function() {
-  console.log('Listening on http://localhost:' + process.env.PORT);
+  console.log('Listening on http://localhost:' + (process.env.PORT || 3000));
 }))
 
 io.on('connection', function (socket) {

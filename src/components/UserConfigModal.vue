@@ -32,7 +32,8 @@ export default {
   methods: {
     start (e) {
       this.caro.setup({
-        ticker
+        ticker,
+        isMyTurn: true
       })
 
       socket.emit('setupGame', {
@@ -40,6 +41,8 @@ export default {
       })
 
       modal.hideModal('user-config-modal')
+      modal.hideModal('modal-winner')
+      modal.hideModal('modal-loose')
     },
 
     pickTicker (e) {

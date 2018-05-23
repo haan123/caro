@@ -35,17 +35,33 @@ class Caro {
     this.ticker = ''
     this.otherTicker = ''
     this.myTurn = true
+    this._isPlaying = false
 
     this.createGrid(options)
   }
 
-  setup ({ ticker }) {
+  setup ({ ticker, isMyTurn }) {
+    this.reset()
+
     this.ticker = ticker
     this.otherTicker = ticker === 'x' ? 'o' : 'x'
+    this._isPlaying = true
+    this.myTurn = isMyTurn
   }
 
   isPlaying () {
-    return this.ticker
+    return this._isPlaying
+  }
+
+  reset () {
+    for (let id in this.cells) {
+      let cell = this.cells[id]
+      cell.type = ''
+      cell.isWin = false
+    }
+
+    this._isPlaying = false
+    this.isOver = false
   }
 
   createGrid ({ rowNo, colNo }) {
@@ -203,6 +219,7 @@ class Caro {
 
     if (isWin) {
       this.isOver = true
+      this._isPlaying = false
     }
 
     return {
