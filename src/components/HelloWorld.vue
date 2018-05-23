@@ -19,16 +19,16 @@
 </template>
 
 <script>
-import Caro from '../core/caro';
-import WinnerModal from './WinnerModal';
-import LooseModal from './LooseModal';
-import UserConfigModal from './UserConfigModal';
-import modal from '../core/modal';
+import Caro from '../core/caro'
+import WinnerModal from './WinnerModal'
+import LooseModal from './LooseModal'
+import UserConfigModal from './UserConfigModal'
+import modal from '../core/modal'
 
-import '../svg/x';
-import '../svg/o';
+import '../svg/x'
+import '../svg/o'
 
-const socket = io("http://localhost:3000")
+const socket = io('http://localhost:3000')
 
 export default {
   name: 'HelloWorld',
@@ -37,35 +37,35 @@ export default {
     UserConfigModal,
     LooseModal
   },
+
   data () {
+    socket.on('updateTick', (data) => {
+      if (!data) return
 
-    socket.on("updateTick", (data) => {
-      if (!data) return;
-
-      const elem = this.$refs[data.cell];
+      const elem = this.$refs[data.cell]
 
       if (elem && elem[0]) {
         this.tick(elem[0], {
           theirTurn: true
         })
       }
-    });
+    })
 
-    socket.on("setupGame", (data) => {
-      if (!data || this.caro.isPlaying()) return;
+    socket.on('setupGame', (data) => {
+      if (!data || this.caro.isPlaying()) return
 
       this.caro.setup({
         ticker: data.ticker === 'x' ? 'o' : 'x'
       })
-    });
+    })
 
-    const rowNo = 20;
-    const colNo = 20;
+    const rowNo = 20
+    const colNo = 20
 
     this.caro = new Caro({
       rowNo,
       colNo
-    });
+    })
 
     return {
       caro: this.caro,
@@ -76,22 +76,22 @@ export default {
   },
   methods: {
     newGame () {
-      if (this.caro.isPlaying()) return;
+      if (this.caro.isPlaying()) return
 
       modal.showModal('user-config-modal')
     },
 
-    tick(e, status) {
-      const elem = e.nodeType == 1 ? e : e.currentTarget;
-      const cell = elem.getAttribute('data-cell');
-      const hasTicked = this.$data.cells[cell].type;
-      let tick = this.caro.ticker;
+    tick (e, status) {
+      const elem = e.nodeType === 1 ? e : e.currentTarget
+      const cell = elem.getAttribute('data-cell')
+      const hasTicked = this.$data.cells[cell].type
+      let tick = this.caro.ticker
 
       if (status && status.theirTurn) {
-        tick = this.caro.otherTicker;
+        tick = this.caro.otherTicker
       }
 
-      if (this.caro.isOver || !tick || hasTicked || (!status && !this.caro.myTurn)) return;
+      if (this.caro.isOver || !tick || hasTicked || (!status && !this.caro.myTurn)) return
 
       const result = this.caro.setTick(tick, cell, status && status.theirTurn)
       this.$data.cells[cell].type = tick
@@ -109,7 +109,7 @@ export default {
       }
 
       if (!status || !status.theirTurn) {
-        socket.emit("setTick", {
+        socket.emit('setTick', {
           tick,
           cell
         })
@@ -224,7 +224,6 @@ td {
     }
   }
 }
-
 
 @keyframes fadeIn {
   0% {

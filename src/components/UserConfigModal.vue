@@ -22,28 +22,28 @@
 </template>
 
 <script>
-import modal from '../core/modal';
+import modal from '../core/modal'
 
-const socket = io("http://localhost:3000")
+const socket = io('http://localhost:3000')
 let ticker = ''
 
 export default {
   props: ['caro'],
   methods: {
-    start(e) {
+    start (e) {
       this.caro.setup({
-        ticker
-      });
-
-      socket.emit("setupGame", {
         ticker
       })
 
-      modal.hideModal('user-config-modal');
+      socket.emit('setupGame', {
+        ticker
+      })
+
+      modal.hideModal('user-config-modal')
     },
 
-    pickTicker(e) {
-      ticker = e.target.value;
+    pickTicker (e) {
+      ticker = e.target.value
     }
   }
 }
@@ -53,4 +53,3 @@ export default {
   .user__start {
   }
 </style>
-

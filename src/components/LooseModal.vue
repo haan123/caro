@@ -10,14 +10,13 @@
 </template>
 
 <script>
-import modal from '../core/modal';
+import modal from '../core/modal'
 
 export default {
   methods: {
-    hideModal() {
+    hideModal () {
       modal.hideModal('modal-loose')
     }
   }
 }
 </script>
-
