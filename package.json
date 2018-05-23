@@ -8,7 +8,8 @@
   "scripts": {
     "generate-icons": "vsvg -s ./src/assets -t ./src/svg",
     "dev": "webpack-dev-server --inline --progress --hot --host 0.0.0.0 --config build/webpack.dev.conf.js",
-    "start": "npm run build && node server.js",
+    "start": "node server.js",
+    "postinstall": "npm run build",
     "unit": "jest --config test/unit/jest.conf.js --coverage",
     "e2e": "node test/e2e/runner.js",
     "test": "",
