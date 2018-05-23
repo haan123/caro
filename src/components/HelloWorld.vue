@@ -1,16 +1,18 @@
 <template>
-  <div class="hello">
+  <div class="container">
     <button v-on:click="newGame" class="btn btn-danger btn-lg play">New Game</button>
-    <table>
-      <tbody>
-        <tr v-for="(_, row) in rowNo" :key="row">
-          <td v-for="(_, col) in colNo" :key="col" v-bind:ref="`${row}:${col}`" v-on:click="tick" :data-cell="`${row}:${col}`" v-bind:class="{ 'is-win': cells[`${row}:${col}`].isWin }" :title="`${row}:${col}`">
-            <svgicon v-if="cells[`${row}:${col}`].type === 'x'" icon="x" width="22" height="18" color=""></svgicon>
-            <svgicon v-if="cells[`${row}:${col}`].type === 'o'" icon="o" width="22" height="18" color="#E8104A"></svgicon>
-          </td>
-        </tr>
-      </tbody>
-    </table>
+    <div class="board">
+      <table>
+        <tbody>
+          <tr v-for="(_, row) in rowNo" :key="row">
+            <td v-for="(_, col) in colNo" :key="col" v-bind:ref="`${row}:${col}`" v-on:click="tick" :data-cell="`${row}:${col}`" v-bind:class="{ 'is-win': cells[`${row}:${col}`].isWin }" :title="`${row}:${col}`">
+              <svgicon v-if="cells[`${row}:${col}`].type === 'x'" icon="x" width="22" height="18" color="#4f4b4f"></svgicon>
+              <svgicon v-if="cells[`${row}:${col}`].type === 'o'" icon="o" width="22" height="18" color="#ff0113"></svgicon>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
 
     <WinnerModal></WinnerModal>
     <LooseModal></LooseModal>
@@ -124,9 +126,12 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style lang="scss">
+body {
+  background: linear-gradient(to bottom, #32c0ff 100%,#2199e8 37%);
+}
 table {
-  border-collapse: collapse;
   margin: 0 auto;
+  border-collapse: collapse;
   font-size: 25px;
   color: #E8104A;
 }
@@ -134,14 +139,31 @@ table {
 tr, td {
   margin: 0;
   padding: 0;
+
+  &:last-child {
+    td {
+      border-bottom: 0;
+    }
+  }
 }
 
 td {
-  border: 2px solid #333;
-  height: 40px;
-  width: 40px;
+  border-right: 2px solid #fafafa;
+  border-bottom: 2px solid #fafafa;
+  height: 45px;
+  width: 45px;
   cursor: pointer;
+
+  &:last-child {
+    border-right: 0;
+  }
 }
+
+.board {
+  margin: 0 auto;
+  padding: 16px;
+}
+
 .svg-icon {
   vertical-align: middle;
 }
