@@ -5,5 +5,5 @@ deployment:
   staging:
     branch: master
     heroku:
-      appname: caro-for-you
+      appname: caro4fun
 
