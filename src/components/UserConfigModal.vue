@@ -24,7 +24,7 @@
 <script>
 import modal from '../core/modal'
 
-const socket = io('http://localhost:3000')
+const socket = io(window.SOCKET_URL)
 let ticker = ''
 
 export default {

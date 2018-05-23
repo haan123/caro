@@ -28,7 +28,7 @@ import modal from '../core/modal'
 import '../svg/x'
 import '../svg/o'
 
-const socket = io('http://localhost:3000')
+const socket = io(window.SOCKET_URL)
 
 export default {
   name: 'HelloWorld',

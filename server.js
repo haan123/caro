@@ -22,7 +22,10 @@ app.use(views(path.resolve(__dirname, 'dist'), {
     removeStyleLinkTypeAttributes: true,
     quoteCharacter: '"'
   },
-  autoescape: true
+  autoescape: true,
+  globals: {
+    env: process.env.NODE_ENV
+  }
 }))
 
 const router = new Router()
