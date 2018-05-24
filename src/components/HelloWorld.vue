@@ -1,11 +1,15 @@
 <template>
   <div class="container">
-    <button v-on:click="newGame" class="btn btn-danger btn-lg play">New Game</button>
+    <div class="widgets">
+      <button v-on:click="newGame" class="btn btn-danger btn-lg play">New Game</button>
+
+      <span v-if="caro.isPlaying()" class="turn">Turn: <svgicon v-if="caro.turn === 'x'" icon="x" width="16" height="16" color="#4f4b4f"></svgicon><svgicon v-else icon="o" width="16" height="16" color="#ff0113"></svgicon></span>
+    </div>
     <div class="board">
-      <table>
+      <table v-bind:style="{ width: `${45 * colNo}px` }">
         <tbody>
           <tr v-for="(_, row) in rowNo" :key="row">
-            <td v-for="(_, col) in colNo" :key="col" v-bind:ref="`${row}:${col}`" v-on:click="tick" :data-cell="`${row}:${col}`" v-bind:class="{ 'is-win': cells[`${row}:${col}`].isWin }" :title="`${row}:${col}`">
+            <td v-for="(_, col) in colNo" :key="col" v-bind:ref="`${row}:${col}`" v-on:click="tick" :data-cell="`${row}:${col}`" v-bind:class="{ 'is-win': cells[`${row}:${col}`].isWin }" :title="`${row}:${col}`" style="width:45px;height:45px;">
               <svgicon v-if="cells[`${row}:${col}`].type === 'x'" icon="x" width="22" height="18" color="#4f4b4f"></svgicon>
               <svgicon v-if="cells[`${row}:${col}`].type === 'o'" icon="o" width="22" height="18" color="#ff0113"></svgicon>
             </td>
@@ -54,7 +58,7 @@ export default {
     })
 
     socket.on('setupGame', (data) => {
-      if (!data || this.caro.isPlaying()) return
+      if (!data || (this.caro.gameId === data.gameId)) return
 
       this.caro.setup({
         ticker: data.ticker === 'x' ? 'o' : 'x'
@@ -81,8 +85,6 @@ export default {
   },
   methods: {
     newGame () {
-      if (this.caro.isPlaying()) return
-
       modal.showModal('user-config-modal')
     },
 
@@ -130,6 +132,7 @@ body {
   background: linear-gradient(to bottom, #32c0ff 100%,#2199e8 37%);
 }
 table {
+  table-layout: fixed;
   margin: 0 auto;
   border-collapse: collapse;
   font-size: 25px;
@@ -150,8 +153,6 @@ tr, td {
 td {
   border-right: 2px solid #fafafa;
   border-bottom: 2px solid #fafafa;
-  height: 45px;
-  width: 45px;
   cursor: pointer;
 
   &:last-child {
@@ -162,6 +163,31 @@ td {
 .board {
   margin: 0 auto;
   padding: 16px;
+  overflow: auto;
+}
+
+.widgets {
+  display: flex;
+  align-items: center;
+  position: relative;
+  padding: 1rem;
+  margin-bottom: 2.5rem;
+  color: #444;
+  background: #fefefe;
+  border-radius: 3px;
+  box-shadow: 0 1px 2px rgba(0,0,0,.23);
+}
+
+.turn {
+  display: flex;
+  align-items: center;
+  margin-left: auto;
+  float: right;
+  vertical-align: middle;
+
+  .svg-icon {
+    margin-left: 6px;
+  }
 }
 
 .svg-icon {
@@ -178,7 +204,6 @@ td {
 }
 
 .play {
-  margin-bottom: 16px;
 }
 
 .modal-container {

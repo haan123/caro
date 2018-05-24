@@ -6,12 +6,12 @@
           <div class="form-group">
             <label class="user__ticker">Pick ticker:</label>
             <div class="form-check form-check-inline">
-              <input id="inlineRadio1" v-on:change="pickTicker" class="form-check-input" type="radio" name="ticker" value="x">
-              <label class="form-check-label" for="inlineRadio1"><svgicon icon="x" width="14" height="14" color=""></svgicon></label>
+              <input id="inlineRadio1" v-bind:ref="rdX" class="form-check-input ticker-ipt" type="radio" name="ticker" value="x" checked>
+              <label class="form-check-label" for="inlineRadio1"><svgicon icon="x" width="16" height="16" color=""></svgicon></label>
             </div>
             <div class="form-check form-check-inline">
-              <input id="inlineRadio2" v-on:change="pickTicker" class="form-check-input" type="radio" name="ticker" value="o">
-              <label class="form-check-label" for="inlineRadio2"><svgicon icon="o" width="14" height="14" color="#E8104A"></svgicon></label>
+              <input id="inlineRadio2" v-bind:ref="rdO" class="form-check-input ticker-ipt" type="radio" name="ticker" value="o">
+              <label class="form-check-label" for="inlineRadio2"><svgicon icon="o" width="16" height="16" color="#E8104A"></svgicon></label>
             </div>
           </div>
         </div>
@@ -25,34 +25,49 @@
 import modal from '../core/modal'
 
 const socket = io(window.SOCKET_URL)
-let ticker = ''
 
 export default {
   props: ['caro'],
+
+  data() {
+    return {
+      rdX: 'rdX',
+      rdO: 'rdO'
+    }
+  },
+
   methods: {
     start (e) {
+      const ticker = this.$refs['rdX'].checked ? 'x' : 'o';
+      const gameId = new Date().getTime()
+
       this.caro.setup({
         ticker,
+        gameId,
         isMyTurn: true
       })
 
       socket.emit('setupGame', {
-        ticker
+        ticker,
+        gameId
       })
 
       modal.hideModal('user-config-modal')
       modal.hideModal('modal-winner')
       modal.hideModal('modal-loose')
-    },
-
-    pickTicker (e) {
-      ticker = e.target.value
     }
   }
 }
 </script>
 
 <style lang="scss">
-  .user__start {
+  .user__ticker {
+    vertical-align: middle;
+  }
+
+  .ticker-ipt {
+    width: 16px;
+    height: 16px;
+    cursor: pointer;
   }
 </style>
