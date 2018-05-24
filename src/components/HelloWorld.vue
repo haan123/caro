@@ -9,7 +9,10 @@
       <table v-bind:style="{ width: `${45 * colNo}px` }">
         <tbody>
           <tr v-for="(_, row) in rowNo" :key="row">
-            <td v-for="(_, col) in colNo" :key="col" v-bind:ref="`${row}:${col}`" v-on:click="tick" :data-cell="`${row}:${col}`" v-bind:class="{ 'is-win': cells[`${row}:${col}`].isWin }" :title="`${row}:${col}`" style="width:45px;height:45px;">
+            <td v-for="(_, col) in colNo" :key="col" v-bind:ref="`${row}:${col}`" v-on:click="tick" :data-cell="`${row}:${col}`" v-bind:class="{
+               'is-win': cells[`${row}:${col}`].isWin,
+               'is-current': cells[`${row}:${col}`].isCurrent
+            }" :title="`${row}:${col}`" style="width:45px;height:45px;">
               <svgicon v-if="cells[`${row}:${col}`].type === 'x'" icon="x" width="22" height="18" color="#f1f1f1"></svgicon>
               <svgicon v-if="cells[`${row}:${col}`].type === 'o'" icon="o" width="22" height="18" color="#fb3e26"></svgicon>
             </td>
@@ -103,6 +106,9 @@ export default {
       const result = this.caro.setTick(tick, cell, status && status.theirTurn)
       this.$data.cells[cell].type = tick
 
+      document.title = document.title.replace(/\s\(\w\)/g, ``)
+      document.title += ` (${this.caro.turn})`
+
       if (result.isWin) {
         for (const cellId of result.winPath) {
           this.$data.cells[cellId].isWin = true
@@ -159,6 +165,15 @@ td {
 
   &:last-child {
     border-right: 0;
+  }
+
+  &:hover {
+    background: #0f4a8a;
+  }
+
+  &.is-current,
+  &.is-win {
+    background: #0f4a8a;
   }
 }
 

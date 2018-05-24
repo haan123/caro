@@ -73,7 +73,8 @@ class Caro {
       for (let col = 0; col < colNo; col++) {
         this.cells[`${row}:${col}`] = {
           type: '',
-          isWin: false
+          isWin: false,
+          isCurrent: false
         }
       }
     }
@@ -111,7 +112,22 @@ class Caro {
     this.setCell(tick, cellId)
     this.myTurn = isTheirTurn
     this.turn = this.myTurn ? this.ticker : this.otherTicker
+
+    this.setCurrent(cellId)
     return this.isWinner(tick, cellId)
+  }
+
+  setCurrent (cellId) {
+    let cell = this.getCell(this.currentCell)
+
+    if (cell) {
+      cell.isCurrent = false
+    }
+
+    let currentCell = this.getCell(cellId)
+    currentCell.isCurrent = true
+
+    this.currentCell = cellId
   }
 
   getLeftPath (dir, path, row, col) {
