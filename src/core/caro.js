@@ -124,7 +124,7 @@ class Caro {
       cell.isCurrent = false
     }
 
-    let currentCell = this.getCell(cellId)
+    let currentCell = this.getCell(cellId) || {}
     currentCell.isCurrent = true
 
     this.currentCell = cellId
@@ -135,7 +135,7 @@ class Caro {
     col = dir.leftCol(col)
 
     const cellId = this.createId(row, col)
-    let cell = this.getCell(cellId)
+    let cell = this.getCell(cellId) || {}
 
     if (!cell.type) return path
 
@@ -149,7 +149,7 @@ class Caro {
     col = dir.rightCol(col)
 
     const cellId = this.createId(row, col)
-    let cell = this.getCell(cellId)
+    let cell = this.getCell(cellId) || {}
 
     if (!cell.type) return path
 
@@ -190,7 +190,7 @@ class Caro {
       let temp = []
 
       path.map((id, index) => {
-        const cell = this.getCell(id)
+        const cell = this.getCell(id) || {}
 
         if (cell.type === tick) {
           temp.push(index)
