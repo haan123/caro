@@ -10,8 +10,8 @@
         <tbody>
           <tr v-for="(_, row) in rowNo" :key="row">
             <td v-for="(_, col) in colNo" :key="col" v-bind:ref="`${row}:${col}`" v-on:click="tick" :data-cell="`${row}:${col}`" v-bind:class="{ 'is-win': cells[`${row}:${col}`].isWin }" :title="`${row}:${col}`" style="width:45px;height:45px;">
-              <svgicon v-if="cells[`${row}:${col}`].type === 'x'" icon="x" width="22" height="18" color="#4f4b4f"></svgicon>
-              <svgicon v-if="cells[`${row}:${col}`].type === 'o'" icon="o" width="22" height="18" color="#ff0113"></svgicon>
+              <svgicon v-if="cells[`${row}:${col}`].type === 'x'" icon="x" width="22" height="18" color="#f1f1f1"></svgicon>
+              <svgicon v-if="cells[`${row}:${col}`].type === 'o'" icon="o" width="22" height="18" color="#fb3e26"></svgicon>
             </td>
           </tr>
         </tbody>
@@ -129,7 +129,7 @@ export default {
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style lang="scss">
 body {
-  background: linear-gradient(to bottom, #32c0ff 100%,#2199e8 37%);
+  background: #1f6fc5;
 }
 table {
   table-layout: fixed;
@@ -151,9 +151,11 @@ tr, td {
 }
 
 td {
-  border-right: 2px solid #fafafa;
-  border-bottom: 2px solid #fafafa;
+  background: #13569e;
+  border-right: 2px solid #1f6fc5;
+  border-bottom: 2px solid #1f6fc5;
   cursor: pointer;
+  border-radius: 8px;
 
   &:last-child {
     border-right: 0;
@@ -173,7 +175,7 @@ td {
   padding: 1rem;
   margin-bottom: 2.5rem;
   color: #444;
-  background: #fefefe;
+  background: #e6e6e6;
   border-radius: 3px;
   box-shadow: 0 1px 2px rgba(0,0,0,.23);
 }
