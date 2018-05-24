@@ -9,12 +9,11 @@
     <script src="//cdnjs.cloudflare.com/ajax/libs/socket.io/2.1.1/socket.io.js"></script>
 
     <script>
-      /*{% if env === 'production' %}
+      {% if env === 'production' %}
         window.SOCKET_URL = 'https://caro4fun.herokuapp.com';
       {% else %}
         window.SOCKET_URL = 'http://localhost:3000';
-      {% endif %}*/
-      window.SOCKET_URL = 'http://localhost:3000'
+      {% endif %}
     </script>
   </head>
   <body>
