@@ -219,7 +219,7 @@ class Caro {
               isWin = true
             }
           } else if (length > 4) {
-            if ((prevCell.type && !nextCell.type) || (!prevCell.type && nextCell.type)) {
+            if ((!prevCell.type && !nextCell.type) || (prevCell.type && !nextCell.type) || (!prevCell.type && nextCell.type)) {
               isWin = true
             }
           }
