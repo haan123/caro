@@ -7,6 +7,7 @@ const serveStatic = require('koa-better-static')
 
 // initialize the app
 const app = new Koa()
+const game = {}
 
 app.use(convert(serveStatic(path.resolve(__dirname, 'dist'), {
   maxage: 86400000
@@ -50,6 +51,11 @@ io.on('connection', function (socket) {
   })
 
   socket.on('setupGame', function (data) {
+    console.log('setupGame', data)
+    io.sockets.emit('setupGame', data)
+  })
+
+  socket.on('connect', function (data) {
     console.log('setupGame', data)
     io.sockets.emit('setupGame', data)
   })

@@ -3,6 +3,9 @@
     <div class="widgets">
       <button v-on:click="newGame" class="btn btn-danger btn-lg play">New Game</button>
 
+      <span class="alert alert-secondary loading" role="alert">Waiting for player</span>
+      <span class="alert alert-success" role="alert">Connected</span>
+
       <span v-if="caro.isPlaying()" class="turn">Turn: <svgicon v-if="caro.turn === 'x'" icon="x" width="16" height="16" color="#4f4b4f"></svgicon><svgicon v-else icon="o" width="16" height="16" color="#ff0113"></svgicon></span>
     </div>
     <div class="board">
@@ -38,6 +41,7 @@ import '../svg/x'
 import '../svg/o'
 
 const socket = io(window.SOCKET_URL)
+const isPlayerConnected = false
 
 export default {
   name: 'HelloWorld',
@@ -61,6 +65,17 @@ export default {
     })
 
     socket.on('setupGame', (data) => {
+      if (!data || (this.caro.gameId === data.gameId)) return
+
+      this.caro.setup({
+        ticker: data.ticker === 'x' ? 'o' : 'x'
+      })
+
+      modal.hideModal('modal-winner')
+      modal.hideModal('modal-loose')
+    })
+
+    socket.emit('connect', function (data) {
       if (!data || (this.caro.gameId === data.gameId)) return
 
       this.caro.setup({
@@ -175,6 +190,11 @@ td {
   &.is-win {
     background: #0f4a8a;
   }
+}
+
+.alert {
+  margin-bottom: 0;
+  margin-left: 6px;
 }
 
 .board {
@@ -345,4 +365,30 @@ td {
     transform:scale(0);
   }
 }
+
+.loading:after {
+  content: ' .';
+  animation: dots 1s steps(5, end) infinite;
+}
+
+@keyframes dots {
+  0%, 20% {
+    color: #383d41;
+    text-shadow:
+      .25em 0 0 #383d41,
+      .5em 0 0 #383d41;
+  }
+  40% {
+    color: #e2e3e5;
+    text-shadow:
+      .25em 0 0 #383d41,
+      .5em 0 0 #383d41;}
+  60% {
+    text-shadow:
+      .25em 0 0 #e2e3e5,
+      .5em 0 0 #383d41;}
+  80%, 100% {
+    text-shadow:
+      .25em 0 0 #e2e3e5,
+      .5em 0 0 #e2e3e5;}}
 </style>

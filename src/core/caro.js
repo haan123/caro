@@ -135,11 +135,11 @@ class Caro {
     col = dir.leftCol(col)
 
     const cellId = this.createId(row, col)
-    let cell = this.getCell(cellId) || {}
+    let cell = this.getCell(cellId)
 
-    if (!cell.type) return path
+    if (!cell) return path
 
-    path.push(`${row}:${col}`)
+    path.unshift(`${row}:${col}`)
 
     this.getLeftPath(dir, path, row--, col--)
   }
@@ -149,9 +149,9 @@ class Caro {
     col = dir.rightCol(col)
 
     const cellId = this.createId(row, col)
-    let cell = this.getCell(cellId) || {}
+    let cell = this.getCell(cellId)
 
-    if (!cell.type) return path
+    if (!cell) return path
 
     path.push(`${row}:${col}`)
 
@@ -163,11 +163,13 @@ class Caro {
     let paths = []
 
     DIR.map((dir) => {
-      const path = [`${row}:${col}`]
+      let path = [`${row}:${col}`]
 
       this.getLeftPath(dir, path, row, col)
 
       this.getRightPath(dir, path, row, col)
+
+      path = this.clearBound(path)
 
       paths.push(path.sort((a, b) => {
         a = +a.replace(':', '')
@@ -178,6 +180,32 @@ class Caro {
     })
 
     return paths
+  }
+
+  clearBound (path) {
+    const length = path.length
+    let start = -1
+    let end
+
+    for (let i = 0; i < length; i++) {
+      const id = path[i]
+
+      if (!id) return
+
+      const cell = this.getCell(id)
+
+      if (cell && cell.type) {
+        if (start === -1) {
+          start = i
+        }
+
+        end = i
+      }
+    }
+
+    path = path.slice(start, end + 1)
+
+    return path
   }
 
   isWinner (tick, cellId) {

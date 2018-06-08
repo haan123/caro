@@ -29,7 +29,7 @@ const socket = io(window.SOCKET_URL)
 export default {
   props: ['caro'],
 
-  data() {
+  data () {
     return {
       rdX: 'rdX',
       rdO: 'rdO'
@@ -38,7 +38,7 @@ export default {
 
   methods: {
     start (e) {
-      const ticker = this.$refs['rdX'].checked ? 'x' : 'o';
+      const ticker = this.$refs['rdX'].checked ? 'x' : 'o'
       const gameId = new Date().getTime()
 
       this.caro.setup({
