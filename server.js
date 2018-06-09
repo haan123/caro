@@ -55,6 +55,11 @@ io.on('connection', function (socket) {
     io.sockets.emit('setupGame', data)
   })
 
+  socket.on('setOtherWinningPath', function (data) {
+    console.log('setOtherWinningPath', data)
+    io.sockets.emit('setOtherWinningPath', data)
+  })
+
   socket.on('connect', function (data) {
     console.log('setupGame', data)
     io.sockets.emit('setupGame', data)

@@ -3,9 +3,6 @@
     <div class="widgets">
       <button v-on:click="newGame" class="btn btn-danger btn-lg play">New Game</button>
 
-      <span class="alert alert-secondary loading" role="alert">Waiting for player</span>
-      <span class="alert alert-success" role="alert">Connected</span>
-
       <span v-if="caro.isPlaying()" class="turn">Turn: <svgicon v-if="caro.turn === 'x'" icon="x" width="16" height="16" color="#4f4b4f"></svgicon><svgicon v-else icon="o" width="16" height="16" color="#ff0113"></svgicon></span>
     </div>
     <div class="board">
@@ -41,7 +38,6 @@ import '../svg/x'
 import '../svg/o'
 
 const socket = io(window.SOCKET_URL)
-const isPlayerConnected = false
 
 export default {
   name: 'HelloWorld',
@@ -75,15 +71,10 @@ export default {
       modal.hideModal('modal-loose')
     })
 
-    socket.emit('connect', function (data) {
-      if (!data || (this.caro.gameId === data.gameId)) return
+    socket.on('setOtherWinningPath', (data) => {
+      if (!data || (this.caro.isOtherHasWinningPath)) return
 
-      this.caro.setup({
-        ticker: data.ticker === 'x' ? 'o' : 'x'
-      })
-
-      modal.hideModal('modal-winner')
-      modal.hideModal('modal-loose')
+      this.caro.setOtherWinningPath()
     })
 
     const rowNo = 20
@@ -121,8 +112,8 @@ export default {
       const result = this.caro.setTick(tick, cell, status && status.theirTurn)
       this.$data.cells[cell].type = tick
 
-      document.title = document.title.replace(/\s\(\w\)/g, ``)
-      document.title += ` (${this.caro.turn})`
+      document.title = document.title.replace(/\s-\s\w\sturn/g, ``)
+      document.title += ` - ${this.caro.turn.toUpperCase()} turn`
 
       if (result.isWin) {
         for (const cellId of result.winPath) {
@@ -134,6 +125,8 @@ export default {
         } else {
           modal.showModal('modal-loose')
         }
+      } else if (this.caro.isOtherHasWinningPath) {
+        socket.emit('setOtherWinningPath', true)
       }
 
       if (!status || !status.theirTurn) {

@@ -37,6 +37,7 @@ class Caro {
     this.myTurn = true
     this._isPlaying = false
     this._gameId = false
+    this.isOtherHasWinningPath = false
 
     this.createGrid(options)
   }
@@ -50,6 +51,7 @@ class Caro {
     this.myTurn = isMyTurn
     this.turn = isMyTurn ? this.ticker : this.otherTicker
     this.gameId = gameId
+    this.isOtherHasWinningPath = false
   }
 
   isPlaying () {
@@ -130,6 +132,10 @@ class Caro {
     this.currentCell = cellId
   }
 
+  setOtherWinningPath () {
+    this.isOtherHasWinningPath = true
+  }
+
   getLeftPath (dir, path, row, col) {
     row = dir.leftRow(row)
     col = dir.leftCol(col)
@@ -182,6 +188,13 @@ class Caro {
     return paths
   }
 
+  isPathNotBlockedOnBound (path) {
+    const prevCell = this.getCell(path[path[0] - 1]) || {}
+    const nextCell = this.getCell(path[path[length - 1] + 1]) || {}
+
+    return (!prevCell.type && !nextCell.type) || (prevCell.type && !nextCell.type) || (!prevCell.type && nextCell.type)
+  }
+
   clearBound (path) {
     const length = path.length
     let start = -1
@@ -208,6 +221,24 @@ class Caro {
     return path
   }
 
+  isWinningPath (path, candidatePath, minCount) {
+    let count = 0
+
+    for (let i = 0; i < candidatePath.length; i++) {
+      const cell = this.getCell(path[candidatePath[i]]) || {}
+
+      if (cell.type) {
+        count++
+
+        if (count >= minCount) return true
+      } else {
+        count = 0
+      }
+    }
+
+    return false
+  }
+
   isWinner (tick, cellId) {
     const paths = this.getPath(cellId)
     let isWin = false
@@ -216,11 +247,12 @@ class Caro {
     for (const path of paths) {
       let candidatePaths = []
       let temp = []
+      let prevTick
 
       path.map((id, index) => {
         const cell = this.getCell(id) || {}
 
-        if (cell.type === tick) {
+        if (cell.type === tick || (!cell.type && prevTick === tick)) {
           temp.push(index)
         } else {
           if (temp.length >= 3) {
@@ -229,6 +261,8 @@ class Caro {
 
           temp = []
         }
+
+        prevTick = cell.type
       })
 
       if (!candidatePaths.length && temp.length >= 3) {
@@ -243,12 +277,18 @@ class Caro {
           const nextCell = this.getCell(path[candidatePath[length - 1] + 1]) || {}
 
           if (length === 4) {
-            if (!prevCell.type && !nextCell.type) {
+            if (!this.isOtherHasWinningPath && !prevCell.type && !nextCell.type && this.isWinningPath(path, candidatePath, 4)) {
               isWin = true
+            } else if (!prevCell.type || !nextCell.type) {
+              this.isOtherHasWinningPath = true
             }
           } else if (length > 4) {
-            if ((!prevCell.type && !nextCell.type) || (prevCell.type && !nextCell.type) || (!prevCell.type && nextCell.type)) {
-              isWin = true
+            if (this.isWinningPath(path, candidatePath, 5)) {
+              if ((!prevCell.type && !nextCell.type) || (prevCell.type && !nextCell.type) || (!prevCell.type && nextCell.type)) {
+                isWin = true
+              }
+            } else {
+              this.isOtherHasWinningPath = true
             }
           }
 
