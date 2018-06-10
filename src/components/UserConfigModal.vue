@@ -22,42 +22,48 @@
 </template>
 
 <script>
-import modal from '../core/modal'
+/* eslint no-plusplus: 0 */
+/* eslint comma-dangle: 0 */
+/* eslint class-methods-use-this: 0 */
+/* eslint consistent-return: 0 */
+/* eslint array-callback-return: 0 */
 
-const socket = io(window.SOCKET_URL)
+import modal from '../core/modal';
+
+const socket = io(window.SOCKET_URL);
 
 export default {
   props: ['caro'],
 
-  data () {
+  data() {
     return {
       rdX: 'rdX',
       rdO: 'rdO'
-    }
+    };
   },
 
   methods: {
-    start (e) {
-      const ticker = this.$refs['rdX'].checked ? 'x' : 'o'
-      const gameId = new Date().getTime()
+    start() {
+      const ticker = this.$refs.rdX.checked ? 'x' : 'o';
+      const gameId = new Date().getTime();
 
       this.caro.setup({
         ticker,
         gameId,
         isMyTurn: true
-      })
+      });
 
       socket.emit('setupGame', {
         ticker,
         gameId
-      })
+      });
 
-      modal.hideModal('user-config-modal')
-      modal.hideModal('modal-winner')
-      modal.hideModal('modal-loose')
+      modal.hideModal('user-config-modal');
+      modal.hideModal('modal-winner');
+      modal.hideModal('modal-loose');
     }
   }
-}
+};
 </script>
 
 <style lang="scss">
