@@ -254,7 +254,6 @@ class Caro {
         if (cell.type === tick || (!cell.type && prevTick === tick)) {
           temp.push(index);
         } else {
-
           if (temp.length >= 3) {
             candidatePaths.push([...temp]);
           }
