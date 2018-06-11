@@ -219,7 +219,7 @@ class Caro {
     return path;
   }
 
-  isWinningPath(path, candidatePath, minCount) {
+  getPathCount(path, candidatePath, minCount) {
     let count = 0;
 
     for (let i = 0; i < candidatePath.length; i++) {
@@ -228,13 +228,13 @@ class Caro {
       if (cell.type) {
         count += 1;
 
-        if (count >= minCount) return true;
+        if (count >= minCount) break;
       } else {
         count = 0;
       }
     }
 
-    return false;
+    return count;
   }
 
   isWinner(tick, cellId) {
@@ -278,15 +278,19 @@ class Caro {
           const nextCell = this.getCell(path[candidatePath[length - 1] + 1]) || {};
 
           if (length === 4) {
+            const pathCount = this.getPathCount(path, candidatePath, 4);
+
             if (!this.isOtherHasWinningPath
               && !prevCell.type && !nextCell.type
-              && this.isWinningPath(path, candidatePath, 4)) {
+              && pathCount >= 4) {
               isWin = true;
-            } else if (!prevCell.type || !nextCell.type) {
+            } else if (pathCount >= 4 && (!prevCell.type || !nextCell.type)) {
               this.isOtherHasWinningPath = true;
             }
           } else if (length > 4) {
-            if (this.isWinningPath(path, candidatePath, 5)) {
+            const pathCount = this.getPathCount(path, candidatePath, 5);
+
+            if (pathCount >= 5) {
               if ((!prevCell.type && !nextCell.type)
                 || (prevCell.type && !nextCell.type)
                 || (!prevCell.type && nextCell.type)) {
