@@ -38,9 +38,14 @@ router.get('*', async (ctx, next) => {
 
 app.use(router.routes())
 
-const io = require('socket.io')(app.listen(process.env.PORT || 3000, function() {
-  console.log('Listening on http://localhost:' + (process.env.PORT || 3000));
-}))
+const io = require('socket.io')(app.listen(process.env.PORT || 4000, function() {
+  console.log('Listening on http://localhost:' + (process.env.PORT || 4000));
+}), {
+  cors: {
+    origin: "http://localhost:3000",
+    methods: ["GET", "POST"]
+  }
+})
 
 io.on('connection', function (socket) {
   socket.emit('data', { message: 'welcome to the chat' })

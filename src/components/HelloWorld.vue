@@ -3,18 +3,24 @@
     <div class="widgets">
       <button v-on:click="newGame" class="btn btn-danger btn-lg play">New Game</button>
 
-      <span v-if="caro.isGamePlaying()" class="turn">Turn: <svgicon v-if="caro.turn === 'x'" icon="x" width="16" height="16" color="#4f4b4f"></svgicon><svgicon v-else icon="o" width="16" height="16" color="#ff0113"></svgicon></span>
+      <span v-if="caro.isGamePlaying()" class="turn">Turn: <icon v-if="caro.turn === 'x'" :data="X" width="16"
+          height="16" color="#4f4b4f"></icon>
+        <icon v-else :data="O" width="16" height="16" color="#ff0113"></icon>
+      </span>
     </div>
     <div class="board">
       <table v-bind:style="{ width: `${45 * colNo}px` }">
         <tbody>
           <tr v-for="(_, row) in rowNo" :key="row">
-            <td v-for="(_, col) in colNo" :key="col" v-bind:ref="`${row}:${col}`" v-on:click="tick" :data-cell="`${row}:${col}`" v-bind:class="{
-               'is-win': cells[`${row}:${col}`].isWin,
-               'is-current': cells[`${row}:${col}`].isCurrent
-            }" :title="`${row}:${col}`" style="width:45px;height:45px;">
-              <svgicon v-if="cells[`${row}:${col}`].type === 'x'" icon="x" width="22" height="18" color="#f1f1f1"></svgicon>
-              <svgicon v-if="cells[`${row}:${col}`].type === 'o'" icon="o" width="22" height="18" color="#fb3e26"></svgicon>
+            <td v-for="(_, col) in colNo" :key="col" :ref="el => { cellRefs[`${row}:${col}`] = el }"
+              v-on:click="(e) => tick(e)" :data-cell="`${row}:${col}`" v-bind:class="{
+                'is-win': caro.cells[`${row}:${col}`].isWin,
+                'is-current': caro.cells[`${row}:${col}`].isCurrent
+              }" :title="`${row}:${col}`" style="width:45px;height:45px;">
+              <icon v-if="caro.cells[`${row}:${col}`].type === 'x'" :data="X" width="22" height="18" color="#f1f1f1">
+              </icon>
+              <icon v-if="caro.cells[`${row}:${col}`].type === 'o'" :data="O" width="22" height="18" color="#fb3e26">
+              </icon>
             </td>
           </tr>
         </tbody>
@@ -27,122 +33,106 @@
   </div>
 </template>
 
-<script>
-/* eslint no-plusplus: 0 */
-/* eslint comma-dangle: 0 */
-/* eslint class-methods-use-this: 0 */
-/* eslint consistent-return: 0 */
-/* eslint array-callback-return: 0 */
+<script setup lang="ts">
+import { reactive, ref, onBeforeUpdate } from "vue";
+import { io } from "socket.io-client";
 
 import Caro from '../core/caro';
-import WinnerModal from './WinnerModal';
-import LooseModal from './LooseModal';
-import UserConfigModal from './UserConfigModal';
 import modal from '../core/modal';
+import { useSocketStore } from '@/stores/socket';
+import WinnerModal from './WinnerModal.vue';
+import LooseModal from './LooseModal.vue';
+import UserConfigModal from './UserConfigModal.vue';
 
-import '../svg/x';
-import '../svg/o';
+import X from '@/assets/svgs/x.svg';
+import O from '@/assets/svgs/o.svg';
 
-const socket = io(window.SOCKET_URL);
+const socketStore = useSocketStore()
+const socket = io(socketStore.url)
+const rowNo = 20;
+const colNo = 20;
+const cellRefs = ref<Record<string, any>>({})
 
-export default {
-  name: 'HelloWorld',
-  components: {
-    WinnerModal,
-    UserConfigModal,
-    LooseModal
-  },
+const caro = reactive(new Caro({
+  rowNo,
+  colNo
+}));
 
-  data() {
-    socket.on('updateTick', (data) => {
-      if (!data) return;
+socket.on('updateTick', (data: Record<string, any>) => {
+  if (!data) return;
 
-      const elem = this.$refs[data.cell];
+  const elem = cellRefs.value[data.cell];
 
-      if (elem && elem[0]) {
-        this.tick(elem[0], {
-          theirTurn: true
-        });
-      }
+  if (elem) {
+    tick(elem, {
+      theirTurn: true
     });
-
-    socket.on('setupGame', (data) => {
-      if (!data || (this.caro.gameId === data.gameId)) return;
-
-      this.caro.setup({
-        ticker: data.ticker === 'x' ? 'o' : 'x'
-      });
-
-      modal.hideModal('modal-winner');
-      modal.hideModal('modal-loose');
-    });
-
-    socket.on('setOtherWinningPath', (data) => {
-      if (!data || (this.caro.isOtherHasWinningPath)) return;
-
-      this.caro.setOtherWinningPath();
-    });
-
-    const rowNo = 20;
-    const colNo = 20;
-
-    this.caro = new Caro({
-      rowNo,
-      colNo
-    });
-
-    return {
-      caro: this.caro,
-      rowNo,
-      colNo,
-      cells: this.caro.cells
-    };
-  },
-  methods: {
-    newGame() {
-      modal.showModal('user-config-modal');
-    },
-
-    tick(e, status) {
-      const elem = e.nodeType === 1 ? e : e.currentTarget;
-      const cell = elem.getAttribute('data-cell');
-      const hasTicked = this.$data.cells[cell].type;
-      let tick = this.caro.ticker;
-
-      if (status && status.theirTurn) {
-        tick = this.caro.otherTicker;
-      }
-
-      if (this.caro.isOver || !tick || hasTicked || (!status && !this.caro.myTurn)) return;
-
-      const result = this.caro.setTick(tick, cell, status && status.theirTurn);
-      this.$data.cells[cell].type = tick;
-
-      document.title = document.title.replace(/\s-\s\w\sturn/g, '');
-      document.title += ` - ${this.caro.turn.toUpperCase()} turn`;
-
-      if (result.isWin) {
-        for (let i = 0; i < result.winPath.length; i++) {
-          const cellId = result.winPath[i];
-          this.$data.cells[cellId].isWin = true;
-        }
-
-        if (tick === this.caro.ticker) {
-          modal.showModal('modal-winner');
-        } else {
-          modal.showModal('modal-loose');
-        }
-      } else if (this.caro.isOtherHasWinningPath) {
-        socket.emit('setOtherWinningPath', true);
-      }
-
-      if (!status || !status.theirTurn) {
-        socket.emit('setTick', {
-          tick,
-          cell
-        });
-      }
-    }
   }
-};
+});
+
+socket.on('setupGame', (data: Record<string, any>) => {
+  if (!data || (caro.gameId === data.gameId)) return;
+
+  caro.setup({
+    ticker: data.ticker === 'x' ? 'o' : 'x'
+  });
+
+  modal.hideModal('modal-winner');
+  modal.hideModal('modal-loose');
+});
+
+socket.on('setOtherWinningPath', (data: Record<string, any>) => {
+  if (!data || (caro.isOtherHasWinningPath)) return;
+
+  caro.setOtherWinningPath();
+});
+
+function newGame() {
+  modal.showModal('user-config-modal');
+}
+
+function tick(e: any, status?: Record<string, any>) {
+  const elem = e.nodeType === 1 ? e : e.currentTarget;
+  const cell = elem.getAttribute('data-cell');
+  const hasTicked = caro.cells[cell].type;
+  let tick = caro.ticker;
+
+  if (status && status.theirTurn) {
+    tick = caro.otherTicker;
+  }
+
+  if (caro.isOver || !tick || hasTicked || (!status && !caro.myTurn)) return;
+
+  const result = caro.setTick(tick, cell, status && status.theirTurn);
+  caro.cells[cell].type = tick;
+
+  document.title = document.title.replace(/\s-\s\w\sturn/g, '');
+  document.title += ` - ${caro.turn.toUpperCase()} turn`;
+
+  if (result.isWin) {
+    for (let i = 0; i < result.winPath.length; i++) {
+      const cellId = result.winPath[i];
+      caro.cells[cellId].isWin = true;
+    }
+
+    if (tick === caro.ticker) {
+      modal.showModal('modal-winner');
+    } else {
+      modal.showModal('modal-loose');
+    }
+  } else if (caro.isOtherHasWinningPath) {
+    socket.emit('setOtherWinningPath', true);
+  }
+
+  if (!status || !status.theirTurn) {
+    socket.emit('setTick', {
+      tick,
+      cell
+    });
+  }
+}
+
+onBeforeUpdate(() => {
+  cellRefs.value = {}
+})
 </script>

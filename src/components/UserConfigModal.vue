@@ -6,12 +6,18 @@
           <div class="form-group">
             <label class="user__ticker">Pick ticker:</label>
             <div class="form-check form-check-inline">
-              <input id="inlineRadio1" v-bind:ref="rdX" class="form-check-input ticker-ipt" type="radio" name="ticker" value="x" checked>
-              <label class="form-check-label" for="inlineRadio1"><svgicon icon="x" width="16" height="16" color="#4f4b4f"></svgicon></label>
+              <input id="inlineRadio1" ref="rdX" class="form-check-input ticker-ipt" type="radio" name="ticker"
+                value="x" checked>
+              <label class="form-check-label" for="inlineRadio1">
+                <icon :data="X" width="16" height="16" color="#4f4b4f"></icon>
+              </label>
             </div>
             <div class="form-check form-check-inline">
-              <input id="inlineRadio2" v-bind:ref="rdO" class="form-check-input ticker-ipt" type="radio" name="ticker" value="o">
-              <label class="form-check-label" for="inlineRadio2"><svgicon icon="o" width="16" height="16" color="#fb3e26"></svgicon></label>
+              <input id="inlineRadio2" ref="rdO" class="form-check-input ticker-ipt" type="radio" name="ticker"
+                value="o">
+              <label class="form-check-label" for="inlineRadio2">
+                <icon :data="O" width="16" height="16" color="#fb3e26"></icon>
+              </label>
             </div>
           </div>
         </div>
@@ -21,59 +27,54 @@
   </div>
 </template>
 
-<script>
-/* eslint no-plusplus: 0 */
-/* eslint comma-dangle: 0 */
-/* eslint class-methods-use-this: 0 */
-/* eslint consistent-return: 0 */
-/* eslint array-callback-return: 0 */
+<script setup lang="ts">
+import { ref } from "vue";
+import { io } from "socket.io-client";
 
 import modal from '../core/modal';
+import { useSocketStore } from '@/stores/socket';
+import X from '@/assets/svgs/x.svg';
+import O from '@/assets/svgs/o.svg';
 
-const socket = io(window.SOCKET_URL);
+const socketStore = useSocketStore()
+const socket = io(socketStore.url);
 
-export default {
-  props: ['caro'],
+const props = defineProps<{
+  caro: Record<string, any>
+}>()
 
-  data() {
-    return {
-      rdX: 'rdX',
-      rdO: 'rdO'
-    };
-  },
+const rdX = ref()
+const rdO = ref()
 
-  methods: {
-    start() {
-      const ticker = this.$refs.rdX.checked ? 'x' : 'o';
-      const gameId = new Date().getTime();
+function start() {
+  const ticker = rdX.value.checked ? 'x' : 'o';
+  const gameId = new Date().getTime();
 
-      this.caro.setup({
-        ticker,
-        gameId,
-        isMyTurn: true
-      });
+  props.caro.setup({
+    ticker,
+    gameId,
+    isMyTurn: true
+  });
 
-      socket.emit('setupGame', {
-        ticker,
-        gameId
-      });
+  socket.emit('setupGame', {
+    ticker,
+    gameId
+  });
 
-      modal.hideModal('user-config-modal');
-      modal.hideModal('modal-winner');
-      modal.hideModal('modal-loose');
-    }
-  }
-};
+  modal.hideModal('user-config-modal');
+  modal.hideModal('modal-winner');
+  modal.hideModal('modal-loose');
+}
 </script>
 
-<style lang="scss">
-  .user__ticker {
-    vertical-align: middle;
-  }
+<style lang="postcss">
+.user__ticker {
+  vertical-align: middle;
+}
 
-  .ticker-ipt {
-    width: 16px;
-    height: 16px;
-    cursor: pointer;
-  }
+.ticker-ipt {
+  width: 16px;
+  height: 16px;
+  cursor: pointer;
+}
 </style>
