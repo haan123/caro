@@ -4,6 +4,6 @@ machine:
 deployment:
   staging:
     branch: master
-    heroku:
+    netlify:
       appname: caro4fun
 
